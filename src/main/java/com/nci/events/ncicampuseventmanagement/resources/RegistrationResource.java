@@ -8,6 +8,8 @@ import com.nci.events.ncicampuseventmanagement.services.CampusService;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,10 @@ public class RegistrationResource {
     //creating a new registration
     @POST
     @Path("/{studentId}")
-    public  Response register(@PathParam("eventId") String eId, @PathParam("studentId") String sId){
+    @Produces(MediaType.APPLICATION_JSON)
+    public  Response register(
+                @PathParam("eventId") String eId, 
+                @PathParam("studentId") String sId){
         if ( (!CampusService.events.containsKey(eId)) || (!CampusService.students.containsKey(sId)) ){
             return Response.status(Response.Status.CONFLICT)
                             .entity("Already Registred")
@@ -30,7 +35,7 @@ public class RegistrationResource {
         
         //Creating a new list to hold the registrations
         List<String> attendees = CampusService.registrations.computeIfAbsent(eId, k -> new ArrayList<>());
-        if (attendees.contains(sId)){
+        if ( (attendees != null) && (attendees.contains(sId)) ){
             return Response.status(Response.Status.CONFLICT)
                             .entity("Already Registered")
                             .build();
